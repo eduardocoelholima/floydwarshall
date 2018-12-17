@@ -11,7 +11,7 @@ Departamento de Informática e Matemática Aplicada da UFRN, ministrada pelo Pro
 
 - Matrix.cpp
 - main.cpp (main program)
-- input.txt, input2.txt (input graphs for testing)
+- input.txt, input2.txt, input3.txt, grafo1.txt (input graphs for testing)
 - main (Linux binary)
 - main.exe (Windows binary)
 - README.md (this file)

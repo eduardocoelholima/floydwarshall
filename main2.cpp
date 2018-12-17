@@ -3,14 +3,25 @@
 #Floyd Warshall
 A C++ Implementation of Floyd-Warshall's Minimum Distante Paths for Graphs
 
-Calculates the shortest paths among any two vertices in a graph with no
-negative cycles. Input is made through a text file specially formatted.
+Calculates the shortest paths among any two vertices in a graph with no negative cycles.
+Input is made through a text file specially formatted.
 Code was based on Cormen's pseudocode.
 
 by Eduardo Coelho de Lima
-https://github.com/eduardocoelholima/floydwarshall
 
---------------------------------------------------------------------
+
+Este projeto foi desenvolvido durante a Disciplina de Algoritmos e Estruturas de Dados no
+Departamento de Informática e Matemática Aplicada da UFRN, ministrada pelo Professor Bruno Motta de Carvalho.
+
+- Matrix.cpp
+- main.cpp (main program)
+- input.txt, input2.txt (input graphs for testing)
+- main (Linux binary)
+- main.exe (Windows binary)
+- README.md (this file)
+
+
+
 
 Universidade Federal do Rio Grande do Norte
 Departamento de Informatica e Matematica Aplicada
@@ -46,7 +57,7 @@ A implementacao do algoritmo esta presente nos seguintes arquivos:
 
 - main.cpp (Programa Principal)
 - Matrix.cpp (Classe Matrix usada para armazenar as matrizes D e PI)
-- input.txt, input2.txt, input3.txt, grafo1.txt (Exemplos de arquivo de entrada)
+- input.txt, input2.txt (Exemplos de arquivo de entrada)
 - main.exe (Programa compilado para Windows)
 - main (Programa compilado para Linux)
 - README.md (Descricao do projeto)
@@ -81,21 +92,37 @@ um todo possui complexidade assimptotica de Theta(n^3).
 #define NIL -999999
 using namespace std;
 
+/*
+void faca_algo(int x) {
+	int array[x][x][x] = {};
+	cout<<array[0][0][0];
+}
+
+int main() {
+	faca_algo(4);
+}
+*/
 
 int main(int argc, char const *argv[]) {
 
-	// Checks if filename was specified in the command line,
+	// example input edge weights matrix
+	// W should be a 2-dimentional square matrix (n x n),
+	// where n is the number of vertices
+	//int n = 5;
+	//int W[n][n] = {{0,3,8,INF,-4},{INF,0,INF,1,7},{INF,4,0,INF,INF},{2,INF,-5,0,INF},{INF,INF,INF,6,0}};
+
+
+	// checks if filename was specified in the command line,
 	// otherwise searches for input.txt in current path
 	string filename = "input.txt";
 	if (argv[1]==nullptr) cout<<"No file specified. ";
 	else filename = string(argv[1]);
 	ifstream readfile (filename);
 
-	// Iterates the file stream, file should contain graph's edges,
-	// will process first line as the number of vertices n, and
+	// iterates the file stream, file should contain graph's edges
+	// will process first line as the number of vertices n
 	// each following line should then have n space-separated numerals
-	// thus total number of lines on file should be 1+n.
-	// While reading input, we assume 9999+ or 'INF' to be infinite
+	// thus total number of lines on file should be 1+n
 	string word;
 	int n;
   	if (readfile.is_open()) {
@@ -103,10 +130,7 @@ int main(int argc, char const *argv[]) {
   		readfile >> word;
   		n = stoi(word);
   	}
-  	else {
-  		cout << "Could not open " << filename << "." << endl; 
-  		return 0;
-  	}
+  	else cout << "Could not open " << filename << "." << endl; 
   	int W[n][n];
 	for (int i=0; i<n; i++) {
 		for (int j=0; j<n; j++) {
@@ -115,27 +139,23 @@ int main(int argc, char const *argv[]) {
 				cout<< "Malformed file."<<endl;
 				return 0;
 			}
-			if (word=="INF") 
-				W[i][j] = INF;
-			else {
-				W[i][j] = stoi(word);
-				if (W[i][j]>=9999) W[i][j]=INF;
-			}
+			W[i][j] = stoi(word);
+			if (W[i][j]>=9999) W[i][j]=INF; //assuming 9999+ to be infinite
 		}
 	}
 	readfile.close();
 
 
-	// Creates a 3-dimentional distance D matrix
-	// and a 3-dimentional PI matrix (previous vertex referente).
-	// First dimension k represents algorithm iteration count,
-	// second dimension i represents source vertix,
+	// creates a 3-dimentional distance D matrix
+	// and a 3-dimentional PI matrix (previous vertex referente)
+	// first dimension k represents algorithm iteration count
+	// second dimension i represents source vertix
 	// third dimension j represents destination vertix
 	Matrix *D = new Matrix(n);
 	Matrix *PI = new Matrix(n);
 
 
-	// Loads W into D(0,*,*) and PI(0,*,*).
+	// loads W into D(0,*,*) and PI(0,*,*)
 	// pi(0,i,j) will hold value of i, when there is an edge (i,j)
 	for (int i=0;i<n;i++) {
 			for (int j=0;j<n;j++) {
@@ -146,10 +166,11 @@ int main(int argc, char const *argv[]) {
 	}
 
 
-	// Runs floyd-warshall's algorithm
+	// runs floyd-warshall's algorithm
 	for (int k=1;k<=n;k++) {
 		for (int i=0;i<n;i++) {
 			for (int j=0;j<n;j++) {
+				//D->write(k,i,j,min(D->read(k-1,i,j), (D->read(k-1,i,k-1)) + D->read(k-1,k-1,j)));
 				if ( (D->read(k-1,i,k-1)!=INF && D->read(k-1,k-1,j)!=INF) && 
 					 (D->read(k-1,i,j) > (D->read(k-1,i,k-1) + D->read(k-1,k-1,j) ) ) ) {
 					D->write(k,i,j,(D->read(k-1,i,k-1) + D->read(k-1,k-1,j)));
@@ -164,12 +185,12 @@ int main(int argc, char const *argv[]) {
 	}
 
 
-	// Prints matrices D and PI
+	// prints matrices D and PI
 	D->print("D",0);
 	PI->print("PI",1);
 
 
-	// Checks if there is any negative cicle in the graph
+	// checks if there is any negative cicle in the graph
 	for (int i=0;i<n;i++) {
 		if (D->read(n,i,i)<0) {
 			cout<<"Negative cycle found"<<endl;
